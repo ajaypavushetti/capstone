@@ -41,16 +41,19 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Database connection & Server initialization
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
+// Database connection & Server initialization with auto-retry
+async function connectDBWithRetry() {
+  try {
+    await mongoose.connect(MONGO_URI);
     console.log('✅ Order Service connected to MongoDB database');
-    app.listen(PORT, () => {
-      console.log(`🚀 Order Service running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error('❌ Failed to connect to MongoDB in Order Service:', err.message);
-    process.exit(1);
-  });
+    console.log('⚠️ Retrying MongoDB connection in 10 seconds...');
+    setTimeout(connectDBWithRetry, 10000);
+  }
+}
+
+app.listen(PORT, () => {
+  console.log(`🚀 Order Service running on port ${PORT}`);
+  connectDBWithRetry();
+});
