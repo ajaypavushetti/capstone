@@ -135,6 +135,50 @@ Deploy all 6 microservices to a Kubernetes cluster (Minikube / Docker Desktop K8
 
 ---
 
+## 🐧 Running on Linux VM / Minikube
+
+If deploying or evaluating on a **Linux Virtual Machine (Ubuntu / Debian VM)**:
+
+### 1. Docker Compose on Linux VM
+```bash
+# Allow firewall ports for external access from host machine
+sudo ufw allow 3000/tcp
+sudo ufw allow 4000/tcp
+
+# Build and launch microservices
+docker compose up --build -d
+```
+Access the application from your PC browser at `http://<LINUX_VM_IP>:3000`.
+
+### 2. Kubernetes / Minikube on Linux VM
+```bash
+# 1. Start Minikube
+minikube start --driver=docker
+
+# 2. Point Docker CLI to Minikube's Docker daemon (REQUIRED for local image access)
+eval $(minikube docker-env)
+
+# 3. Build container images inside Minikube
+docker build -t capstone-catalog-service:latest ./services/catalog-service
+docker build -t capstone-order-service:latest ./services/order-service
+docker build -t capstone-rating-service:latest ./services/rating-service
+docker build -t capstone-notification-service:latest ./services/notification-service
+docker build -t capstone-api-gateway:latest ./services/api-gateway
+docker build -t capstone-frontend:latest ./services/frontend
+
+# 4. Deploy Secret & K8s Manifests
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/
+
+# 5. Access via NodePort
+# Web App: http://<LINUX_VM_IP>:30300
+# Express Gateway: http://<LINUX_VM_IP>:30400
+```
+
+> **Note**: The frontend client dynamically resolves API endpoints (`/api`), ensuring seamless communication across Localhost, Docker Compose, Linux VMs, and Kubernetes NodePorts without connection errors.
+
+---
+
 ## How to Run Locally (Without Docker)
 
 ### 1. Install Dependencies

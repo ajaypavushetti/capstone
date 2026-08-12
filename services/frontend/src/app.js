@@ -1,4 +1,19 @@
-const API_URL = 'http://localhost:4000/api';
+// Dynamic API URL resolver supporting Localhost, Docker Compose, Linux VM, and Kubernetes NodePort
+const getApiUrl = () => {
+  const host = window.location.hostname || 'localhost';
+  const port = window.location.port;
+
+  // If running in browser (port 3000, 30300, 4000, 30400, or standard relative reverse proxy)
+  if (window.location.protocol && window.location.protocol.startsWith('http')) {
+    if (port === '3000' || port === '30300' || port === '4000' || port === '30400' || !port) {
+      return '/api';
+    }
+    return `${window.location.protocol}//${host}:4000/api`;
+  }
+  return 'http://localhost:4000/api';
+};
+
+const API_URL = getApiUrl();
 const USER_ID = 'user123';
 
 let cakes = [];
