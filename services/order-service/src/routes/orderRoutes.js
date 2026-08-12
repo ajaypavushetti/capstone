@@ -23,6 +23,21 @@ function calcMemoryTotal(basket) {
   return basket.totalAmount;
 }
 
+// DELETE /api/orders/clear-all - Wipe all orders & baskets
+router.delete('/clear-all', async (req, res) => {
+  try {
+    memoryOrders.length = 0;
+    memoryBaskets.clear();
+    if (mongoose.connection.readyState === 1) {
+      await Order.deleteMany({});
+      await Basket.deleteMany({});
+    }
+    res.json({ success: true, message: 'All orders & baskets cleared successfully' });
+  } catch (error) {
+    res.json({ success: true, message: 'Orders cleared (in-memory)' });
+  }
+});
+
 // GET /api/orders/basket/:userId - Get user's active shopping basket
 router.get('/basket/:userId', async (req, res) => {
   try {

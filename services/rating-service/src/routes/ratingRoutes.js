@@ -72,6 +72,19 @@ router.get('/cake/:cakeId', async (req, res) => {
   }
 });
 
+// DELETE /api/ratings/clear-all - Clear all submitted ratings & reviews
+router.delete('/clear-all', async (req, res) => {
+  try {
+    memoryRatings.length = 0;
+    if (mongoose.connection.readyState === 1) {
+      await Rating.deleteMany({});
+    }
+    res.json({ success: true, message: 'All ratings & reviews cleared successfully' });
+  } catch (error) {
+    res.json({ success: true, message: 'Ratings cleared (in-memory)' });
+  }
+});
+
 // GET /api/ratings/cake/:cakeId/summary - Calculate & display average rating
 router.get('/cake/:cakeId/summary', async (req, res) => {
   try {
@@ -111,31 +124,20 @@ router.get('/cake/:cakeId/summary', async (req, res) => {
 
     res.json({
       success: true,
-      data: { cakeId, averageRating: 4.8, totalRatings: 1 }
+      data: { cakeId, averageRating: 0, totalRatings: 0 }
     });
   } catch (error) {
     res.json({
       success: true,
-      data: { cakeId: req.params.cakeId, averageRating: 4.8, totalRatings: 1 }
+      data: { cakeId: req.params.cakeId, averageRating: 0, totalRatings: 0 }
     });
   }
 });
 
 // GET /api/ratings/summaries - Bulk average ratings map for multiple cakes
 router.get('/summaries', async (req, res) => {
-  const defaultSummaries = {
-    cake_1: { averageRating: 4.9, totalRatings: 18 },
-    cake_2: { averageRating: 4.8, totalRatings: 24 },
-    cake_3: { averageRating: 4.9, totalRatings: 31 },
-    cake_4: { averageRating: 5.0, totalRatings: 15 },
-    cake_5: { averageRating: 4.7, totalRatings: 12 },
-    cake_6: { averageRating: 4.8, totalRatings: 29 },
-    cake_7: { averageRating: 4.9, totalRatings: 22 },
-    cake_8: { averageRating: 4.8, totalRatings: 19 }
-  };
-
   try {
-    const mongoose = require('mongoose');
+    const summaryMap = {};
     if (mongoose.connection.readyState === 1) {
       const stats = await Rating.aggregate([
         {
@@ -147,7 +149,6 @@ router.get('/summaries', async (req, res) => {
         }
       ]);
 
-      const summaryMap = { ...defaultSummaries };
       stats.forEach((s) => {
         summaryMap[s._id] = {
           averageRating: Math.round(s.averageRating * 10) / 10,
@@ -158,9 +159,25 @@ router.get('/summaries', async (req, res) => {
       return res.json({ success: true, data: summaryMap });
     }
 
-    res.json({ success: true, data: defaultSummaries });
+    // In-memory rating aggregation
+    memoryRatings.forEach((r) => {
+      if (!summaryMap[r.cakeId]) {
+        summaryMap[r.cakeId] = { sum: 0, totalRatings: 0 };
+      }
+      summaryMap[r.cakeId].sum += r.rating;
+      summaryMap[r.cakeId].totalRatings += 1;
+    });
+
+    Object.keys(summaryMap).forEach((id) => {
+      summaryMap[id] = {
+        averageRating: Math.round((summaryMap[id].sum / summaryMap[id].totalRatings) * 10) / 10,
+        totalRatings: summaryMap[id].totalRatings
+      };
+    });
+
+    res.json({ success: true, data: summaryMap });
   } catch (error) {
-    res.json({ success: true, data: defaultSummaries });
+    res.json({ success: true, data: {} });
   }
 });
 

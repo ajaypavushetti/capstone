@@ -161,13 +161,17 @@ function renderCakes() {
 
   grid.innerHTML = filtered
     .map((cake) => {
-      const rating = ratingSummaries[cake._id] || { averageRating: 4.8, totalRatings: 1 };
+      const rating = ratingSummaries[cake._id] || { averageRating: 0, totalRatings: 0 };
+      const ratingBadge =
+        rating.totalRatings > 0
+          ? `<span class="rating-tag"><i class="fa-solid fa-star"></i> ${rating.averageRating} (${rating.totalRatings})</span>`
+          : `<span class="rating-tag muted"><i class="fa-regular fa-star"></i> New</span>`;
       return `
       <div class="cake-item-card">
         <div class="card-img-box">
           <img src="${cake.imageUrl}" alt="${cake.name}">
           <span class="category-tag">${cake.category}</span>
-          <span class="rating-tag"><i class="fa-solid fa-star"></i> ${rating.averageRating} (${rating.totalRatings})</span>
+          ${ratingBadge}
         </div>
         <div class="card-content">
           <h3 class="card-title">${cake.name}</h3>

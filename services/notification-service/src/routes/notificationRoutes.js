@@ -5,6 +5,19 @@ const Notification = require('../models/Notification');
 
 const memoryNotifications = [];
 
+// DELETE /api/notifications/clear-all - Wipe all notifications
+router.delete('/clear-all', async (req, res) => {
+  try {
+    memoryNotifications.length = 0;
+    if (mongoose.connection.readyState === 1) {
+      await Notification.deleteMany({});
+    }
+    res.json({ success: true, message: 'All notifications cleared successfully' });
+  } catch (error) {
+    res.json({ success: true, message: 'Notifications cleared (in-memory)' });
+  }
+});
+
 // Helper simulated multi-channel dispatchers (Email, SMS, In-App)
 function dispatchEmailNotification(customerEmail, customerName, orderId, totalAmount, itemSummary) {
   console.log(`📧 [Notification Service - EMAIL DISPATCH] Sent confirmation email to <${customerEmail}> for Order #${orderId}`);
