@@ -2,6 +2,7 @@ const Cake = require('./models/Cake');
 
 const initialCakes = [
   {
+    _id: 'cake_1',
     name: 'Belgian Truffle Fantasy',
     description: 'Rich 70% dark Belgian chocolate ganache layers topped with handcrafted truffles and cocoa dust.',
     category: 'Chocolate',
@@ -12,6 +13,7 @@ const initialCakes = [
     weightKg: 1.2
   },
   {
+    _id: 'cake_2',
     name: 'Wild Berry Vanilla Dream',
     description: 'Soft Madagascar vanilla sponge layered with fresh raspberry compote and whipped cream frosting.',
     category: 'Fruit',
@@ -22,6 +24,7 @@ const initialCakes = [
     weightKg: 1.0
   },
   {
+    _id: 'cake_3',
     name: 'Classic Red Velvet Royale',
     description: 'Traditional cocoa velvet cake layers with silk smooth cream cheese frosting and edible gold leaf.',
     category: 'Red Velvet',
@@ -32,6 +35,7 @@ const initialCakes = [
     weightKg: 1.1
   },
   {
+    _id: 'cake_4',
     name: 'New York Blueberry Cheesecake',
     description: 'Authentic baked cream cheese on a graham cracker crust with lush wild blueberry topping.',
     category: 'Cheesecake',
@@ -42,6 +46,7 @@ const initialCakes = [
     weightKg: 1.5
   },
   {
+    _id: 'cake_5',
     name: 'Golden Mango Passion Delight',
     description: 'Light sponge layered with Alphonso mango pulp and passionfruit glaze for a tropical celebration.',
     category: 'Fruit',
@@ -52,6 +57,7 @@ const initialCakes = [
     weightKg: 1.0
   },
   {
+    _id: 'cake_6',
     name: 'Triple Chocolate Hazelnut Crunch',
     description: 'Layers of milk chocolate mousse, roasted hazelnut praline, and dark chocolate glaze.',
     category: 'Chocolate',
@@ -62,6 +68,7 @@ const initialCakes = [
     weightKg: 1.3
   },
   {
+    _id: 'cake_7',
     name: 'Dutch Dark Chocolate Opera',
     description: 'Classic French-style almond sponge soaked in coffee syrup with layers of dark chocolate ganache.',
     category: 'Chocolate',
@@ -72,6 +79,7 @@ const initialCakes = [
     weightKg: 1.2
   },
   {
+    _id: 'cake_8',
     name: 'Strawberry Velvet Delight',
     description: 'Light vanilla bean sponge packed with freshly harvested strawberries and chantilly cream.',
     category: 'Fruit',
@@ -82,6 +90,7 @@ const initialCakes = [
     weightKg: 1.0
   },
   {
+    _id: 'cake_9',
     name: 'Madagascar Bean Custard Gateau',
     description: 'Pure Madagascar Bourbon vanilla cake layers with silky custard mousse and white chocolate curls.',
     category: 'Vanilla',
@@ -92,6 +101,7 @@ const initialCakes = [
     weightKg: 1.0
   },
   {
+    _id: 'cake_10',
     name: 'Salted Caramel Macadamia Bliss',
     description: 'Moist brown sugar cake drizzled with rich salted caramel sauce and toasted macadamia nuts.',
     category: 'Custom Special',
@@ -102,6 +112,7 @@ const initialCakes = [
     weightKg: 1.4
   },
   {
+    _id: 'cake_11',
     name: 'Raspberry Lemon Chiffon',
     description: 'Zesty lemon chiffon cake infused with tangy raspberry reduction and Meyer lemon curd.',
     category: 'Fruit',
@@ -112,6 +123,7 @@ const initialCakes = [
     weightKg: 1.1
   },
   {
+    _id: 'cake_12',
     name: 'Lotus Biscoff Cream Cheesecake',
     description: 'Creamy baked cheesecake with a spiced Lotus cookie crust and melted caramelized cookie butter glaze.',
     category: 'Cheesecake',
@@ -122,6 +134,7 @@ const initialCakes = [
     weightKg: 1.5
   },
   {
+    _id: 'cake_13',
     name: 'Tiramisu Mascarpone Elegance',
     description: 'Traditional Italian espresso-soaked ladyfingers wrapped in whipped mascarpone cream and Dutch cocoa.',
     category: 'Custom Special',
@@ -132,6 +145,7 @@ const initialCakes = [
     weightKg: 1.2
   },
   {
+    _id: 'cake_14',
     name: 'Red Velvet Raspberry Fusion',
     description: 'Crimson cocoa sponge layered with raspberry coulis and velvety cream cheese frosting.',
     category: 'Red Velvet',
@@ -142,6 +156,7 @@ const initialCakes = [
     weightKg: 1.1
   },
   {
+    _id: 'cake_15',
     name: 'Double Pistachio Rosewater Crown',
     description: 'Delicate Iranian pistachio cake infused with subtle rosewater essence and crushed green pistachios.',
     category: 'Custom Special',
@@ -152,6 +167,7 @@ const initialCakes = [
     weightKg: 1.3
   },
   {
+    _id: 'cake_16',
     name: 'Swiss Dark Fudge Overload',
     description: 'Quadruple layered Swiss dark fudge cake finished with glossy chocolate mirror glaze.',
     category: 'Chocolate',
@@ -166,7 +182,8 @@ const initialCakes = [
 async function seedDatabase() {
   try {
     for (const cake of initialCakes) {
-      await Cake.updateOne({ name: cake.name }, { $set: cake }, { upsert: true });
+      const { _id, ...cakeData } = cake;
+      await Cake.updateOne({ name: cake.name }, { $set: cakeData }, { upsert: true });
     }
     const totalCount = await Cake.countDocuments();
     console.log(`✅ Catalog database synced with ${totalCount} cake products in MongoDB Atlas!`);
@@ -175,4 +192,4 @@ async function seedDatabase() {
   }
 }
 
-module.exports = seedDatabase;
+module.exports = { seedDatabase, initialCakes };
