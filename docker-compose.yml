@@ -1,4 +1,13 @@
 services:
+  mongodb:
+    image: mongo:7.0
+    container_name: cake_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
   catalog-service:
     build:
       context: ./services/catalog-service
@@ -8,7 +17,9 @@ services:
       - "4001:4001"
     environment:
       - PORT=4001
-      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/cake_delight}
+    depends_on:
+      - mongodb
     restart: always
 
   order-service:
@@ -20,10 +31,11 @@ services:
       - "4002:4002"
     environment:
       - PORT=4002
-      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/cake_delight}
       - RABBITMQ_URL=${RABBITMQ_URL:-amqps://ylomjnxq:8RbdOU4yjAGn-jLM_W2VZHytQc44lcSA@puffin.rmq2.cloudamqp.com/ylomjnxq}
       - NOTIFICATION_SERVICE_URL=http://notification-service:4004
     depends_on:
+      - mongodb
       - catalog-service
     restart: always
 
@@ -36,7 +48,9 @@ services:
       - "4003:4003"
     environment:
       - PORT=4003
-      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/cake_delight}
+    depends_on:
+      - mongodb
     restart: always
 
   notification-service:
@@ -48,8 +62,10 @@ services:
       - "4004:4004"
     environment:
       - PORT=4004
-      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+      - MONGO_URI=${MONGO_URI:-mongodb://mongodb:27017/cake_delight}
       - RABBITMQ_URL=${RABBITMQ_URL:-amqps://ylomjnxq:8RbdOU4yjAGn-jLM_W2VZHytQc44lcSA@puffin.rmq2.cloudamqp.com/ylomjnxq}
+    depends_on:
+      - mongodb
     restart: always
 
   api-gateway:
@@ -87,6 +103,9 @@ services:
     depends_on:
       - api-gateway
     restart: always
+
+volumes:
+  mongo_data:
 
 networks:
   default:
