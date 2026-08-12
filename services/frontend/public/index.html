@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cake Delight | Cloud Native Bakery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo"><i class="fa-solid fa-cake-candles"></i></div>
+        <div class="brand-info">
+          <span class="brand-title">Cake Delight</span>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search cakes by name or flavor...">
+      </div>
+
+      <div class="nav-right">
+        <!-- In-App Notification Bell -->
+        <div class="icon-badge-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge" id="notifBadge" style="display:none;">0</span>
+          <!-- Notification Dropdown -->
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="dropdown-header">
+              <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
+              <button class="mark-read-text-btn" id="markAllReadBtn">Mark all read</button>
+            </div>
+            <div class="dropdown-body" id="notifList">
+              <p class="empty-text">No new notifications</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Basket Drawer Button -->
+        <button class="cart-btn" id="basketBtn">
+          <i class="fa-solid fa-basket-shopping"></i>
+          <span>Basket</span>
+          <span class="cart-count" id="basketBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Category Filter Bar -->
+    <div class="filter-wrapper">
+      <div class="categories-list" id="categoryPills">
+        <button class="cat-pill active" data-category="All">All Cakes</button>
+        <button class="cat-pill" data-category="Chocolate">Chocolate</button>
+        <button class="cat-pill" data-category="Fruit">Fruit</button>
+        <button class="cat-pill" data-category="Vanilla">Vanilla</button>
+        <button class="cat-pill" data-category="Cheesecake">Cheesecake</button>
+        <button class="cat-pill" data-category="Red Velvet">Red Velvet</button>
+      </div>
+
+      <!-- Price Range Toggle Bar -->
+      <div class="price-slider-wrapper">
+        <div class="price-slider-header">
+          <span><i class="fa-solid fa-sliders"></i> Max Price: <strong id="maxPriceVal">$50</strong></span>
+        </div>
+        <input type="range" id="priceToggleBar" min="10" max="60" value="50" step="1" class="slider-toggle-bar">
+      </div>
+
+      <div class="count-indicator" id="productCountLabel">Loading catalog...</div>
+    </div>
+
+    <!-- Product Grid -->
+    <section class="catalog-grid" id="catalogGrid">
+      <div class="loading-state">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <p>Connecting to Catalog Microservice...</p>
+      </div>
+    </section>
+
+    <!-- Orders Section -->
+    <section class="orders-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Your Recent Orders</h2>
+        <span class="user-id-tag">User: <strong>user123</strong></span>
+      </div>
+      <div id="orderHistoryList" class="orders-grid">
+        <p class="empty-text">No orders placed yet</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Cart Drawer Slide-over -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-header">
+      <h2><i class="fa-solid fa-basket-shopping"></i> Shopping Basket</h2>
+      <button class="close-btn" id="closeDrawerBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="drawer-body" id="basketItemList">
+      <p class="empty-text">Your basket is empty</p>
+    </div>
+
+    <div class="drawer-footer">
+      <div class="summary-row">
+        <span>Total Amount:</span>
+        <strong id="basketTotal">$0.00</strong>
+      </div>
+      <button class="btn btn-primary btn-block" id="openCheckoutModalBtn" disabled>
+        Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Rating Modal Box -->
+  <div class="modal-overlay" id="ratingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-star" style="color:#f59e0b"></i> Submit Product Rating</h3>
+        <button class="close-btn" id="closeRatingBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="ratingForm">
+        <input type="hidden" id="ratingCakeId">
+        <div class="cake-preview-box">
+          <img id="ratingCakeImg" src="" alt="Cake">
+          <div>
+            <h4 id="ratingCakeTitle">Cake Title</h4>
+            <span id="ratingCakeCategory" class="badge-tag">Category</span>
+          </div>
+        </div>
+
+        <div class="form-group center-text">
+          <label>Select Rating Score</label>
+          <div class="star-rating-box" id="starBox">
+            <i class="fa-solid fa-star star-item" data-val="1"></i>
+            <i class="fa-solid fa-star star-item" data-val="2"></i>
+            <i class="fa-solid fa-star star-item" data-val="3"></i>
+            <i class="fa-solid fa-star star-item" data-val="4"></i>
+            <i class="fa-solid fa-star star-item active" data-val="5"></i>
+          </div>
+          <input type="hidden" id="ratingScore" value="5">
+        </div>
+
+        <div class="form-group">
+          <label>Your Review Comments</label>
+          <textarea id="ratingCommentText" rows="3" placeholder="Tell us what you liked about this cake..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          Submit Rating <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Checkout Modal Box -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-credit-card"></i> Order Checkout</h3>
+        <button class="close-btn" id="closeCheckoutBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="checkoutForm">
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" id="custName" value="Ajay Pavushetti" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="custEmail" value="ajay@cakedelight.com" required>
+        </div>
+        <div class="form-group">
+          <label>Delivery Address</label>
+          <input type="text" id="custAddress" value="Accenture Tech Park, Microservices Suite 4" required>
+        </div>
+
+        <div class="checkout-summary">
+          <div class="summary-line"><span>Total Payable:</span><strong id="modalPayableAmount">$0.00</strong></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          Confirm Order & Checkout <i class="fa-solid fa-check-circle"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Box -->
+  <div class="toast-box" id="toastBox"></div>
+
+  <script src="/src/app.js"></script>
+</body>
+</html>

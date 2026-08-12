@@ -1,0 +1,93 @@
+services:
+  catalog-service:
+    build:
+      context: ./services/catalog-service
+      dockerfile: Dockerfile
+    container_name: cake_catalog_service
+    ports:
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+    restart: always
+
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    container_name: cake_order_service
+    ports:
+      - "4002:4002"
+    environment:
+      - PORT=4002
+      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqps://ylomjnxq:8RbdOU4yjAGn-jLM_W2VZHytQc44lcSA@puffin.rmq2.cloudamqp.com/ylomjnxq}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:4004
+    depends_on:
+      - catalog-service
+    restart: always
+
+  rating-service:
+    build:
+      context: ./services/rating-service
+      dockerfile: Dockerfile
+    container_name: cake_rating_service
+    ports:
+      - "4003:4003"
+    environment:
+      - PORT=4003
+      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+    restart: always
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: cake_notification_service
+    ports:
+      - "4004:4004"
+    environment:
+      - PORT=4004
+      - MONGO_URI=${MONGO_URI:-mongodb+srv://ajaypavushetti123_db_user:Ajay1234@cluster0.zjk35mk.mongodb.net/cake_delight?retryWrites=true&w=majority}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqps://ylomjnxq:8RbdOU4yjAGn-jLM_W2VZHytQc44lcSA@puffin.rmq2.cloudamqp.com/ylomjnxq}
+    restart: always
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: cake_api_gateway
+    ports:
+      - "4000:4000"
+      - "9876:9876"
+    environment:
+      - PORT=4000
+      - CATALOG_SERVICE_URL=http://catalog-service:4001
+      - ORDER_SERVICE_URL=http://order-service:4002
+      - RATING_SERVICE_URL=http://rating-service:4003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:4004
+      - FRONTEND_SERVICE_URL=http://frontend:3000
+    depends_on:
+      - catalog-service
+      - order-service
+      - rating-service
+      - notification-service
+    restart: always
+
+  frontend:
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile
+    container_name: cake_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - GATEWAY_URL=http://api-gateway:4000
+    depends_on:
+      - api-gateway
+    restart: always
+
+networks:
+  default:
+    name: cake_delight_network

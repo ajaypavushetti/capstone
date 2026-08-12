@@ -1,0 +1,14 @@
+{
+  "name": "cake-delight-capstone",
+  "version": "1.0.0",
+  "description": "Cake Delight Cloud Native Microservices System - Capstone Project",
+  "scripts": {
+    "install:all": "npm install --prefix services/catalog-service && npm install --prefix services/order-service && npm install --prefix services/rating-service && npm install --prefix services/notification-service && npm install --prefix services/api-gateway && npm install --prefix services/frontend",
+    "start:catalog": "npm --prefix services/catalog-service start",
+    "start:order": "npm --prefix services/order-service start",
+    "start:rating": "npm --prefix services/rating-service start",
+    "start:notification": "npm --prefix services/notification-service start",
+    "start:gateway": "npm --prefix services/api-gateway start",
+    "start:frontend": "npm --prefix services/frontend start"
+  }
+}

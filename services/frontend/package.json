@@ -1,0 +1,14 @@
+{
+  "name": "cake-delight-frontend",
+  "version": "1.0.0",
+  "description": "Cake Delight Frontend Client Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^3.0.0"
+  }
+}

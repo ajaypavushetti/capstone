@@ -1,0 +1,124 @@
+http:
+  port: 4000
+
+admin:
+  port: 9876
+  host: 0.0.0.0
+
+apiEndpoints:
+  catalogapi:
+    host: '*'
+    paths:
+      - '/api/cakes'
+      - '/api/cakes/*'
+
+  orderapi:
+    host: '*'
+    paths:
+      - '/api/orders'
+      - '/api/orders/*'
+
+  ratingapi:
+    host: '*'
+    paths:
+      - '/api/ratings'
+      - '/api/ratings/*'
+
+  notificationapi:
+    host: '*'
+    paths:
+      - '/api/notifications'
+      - '/api/notifications/*'
+
+  frontendapi:
+    host: '*'
+    paths:
+      - '/'
+      - '/*'
+
+serviceEndpoints:
+  catalogservice:
+    url: '${CATALOG_SERVICE_URL}'
+
+  orderservice:
+    url: '${ORDER_SERVICE_URL}'
+
+  ratingservice:
+    url: '${RATING_SERVICE_URL}'
+
+  notificationservice:
+    url: '${NOTIFICATION_SERVICE_URL}'
+
+  frontendservice:
+    url: '${FRONTEND_SERVICE_URL}'
+
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy
+  - rate-limit
+
+pipelines:
+  catalogpipeline:
+    apiEndpoints:
+      - catalogapi
+    policies:
+      - cors:
+          - action:
+              origin: '*'
+      - proxy:
+          - action:
+              serviceEndpoint: catalogservice
+              changeOrigin: true
+
+  orderpipeline:
+    apiEndpoints:
+      - orderapi
+    policies:
+      - cors:
+          - action:
+              origin: '*'
+      - proxy:
+          - action:
+              serviceEndpoint: orderservice
+              changeOrigin: true
+
+  ratingpipeline:
+    apiEndpoints:
+      - ratingapi
+    policies:
+      - cors:
+          - action:
+              origin: '*'
+      - proxy:
+          - action:
+              serviceEndpoint: ratingservice
+              changeOrigin: true
+
+  notificationpipeline:
+    apiEndpoints:
+      - notificationapi
+    policies:
+      - cors:
+          - action:
+              origin: '*'
+      - proxy:
+          - action:
+              serviceEndpoint: notificationservice
+              changeOrigin: true
+
+  frontendpipeline:
+    apiEndpoints:
+      - frontendapi
+    policies:
+      - cors:
+          - action:
+              origin: '*'
+      - proxy:
+          - action:
+              serviceEndpoint: frontendservice
+              changeOrigin: true
