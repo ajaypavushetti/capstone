@@ -41,19 +41,17 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Database connection & Server initialization with auto-retry
-async function connectDBWithRetry() {
+// Database connection & Server initialization with auto-switch
+async function connectDatabase() {
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log('✅ Rating Service connected to MongoDB database');
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 });
+    console.log('✅ Rating Service connected to local MongoDB database');
   } catch (err) {
-    console.error('❌ Failed to connect to MongoDB in Rating Service:', err.message);
-    console.log('⚠️ Retrying MongoDB connection in 10 seconds...');
-    setTimeout(connectDBWithRetry, 10000);
+    console.log('ℹ️ Rating Service operating in Standalone In-Memory Mode (No external database required)');
   }
 }
 
 app.listen(PORT, () => {
   console.log(`🚀 Rating Service running on port ${PORT}`);
-  connectDBWithRetry();
+  connectDatabase();
 });

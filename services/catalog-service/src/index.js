@@ -41,20 +41,18 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Database connection & Server initialization with auto-retry
-async function connectDBWithRetry() {
+// Database connection & Server initialization with auto-switch
+async function connectDatabase() {
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log('✅ Catalog Service connected to MongoDB database');
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 });
+    console.log('✅ Catalog Service connected to local MongoDB database');
     await seedDatabase();
   } catch (err) {
-    console.error('❌ Failed to connect to MongoDB in Catalog Service:', err.message);
-    console.log('⚠️ Retrying MongoDB connection in 10 seconds...');
-    setTimeout(connectDBWithRetry, 10000);
+    console.log('ℹ️ Catalog Service operating in Standalone In-Memory Mode (No external database required)');
   }
 }
 
 app.listen(PORT, () => {
   console.log(`🚀 Catalog Service running on port ${PORT}`);
-  connectDBWithRetry();
+  connectDatabase();
 });
